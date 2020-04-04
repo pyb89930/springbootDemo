@@ -38,7 +38,7 @@ public class DeviceController {
     public Result sendCmd(String deviceId,int cmdId,int time) {
         Result result = new Result();
         String hxDeviceId = HexUtils.toHexString(deviceId.getBytes()).toString();
-        String hxhhmmss = HexUtils.toHexString(DateUtil.getCurDateStr(DateUtil.DEFAULT_TIME_FORMAT_SIMPLE).getBytes()).toString();
+        String hxhhmmss = HexUtils.toHexString(DateUtil.getCurDateStr(DateUtil.DEFAULT_SHORT_DATE_FORMAT).getBytes()).toString();
         String hxTime = HexUtils.toHexString((time+"").getBytes()).toString();
         String cmdContent = null;
         if(cmdId == 0){//恢复
