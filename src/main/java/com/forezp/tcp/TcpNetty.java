@@ -3,6 +3,7 @@ package com.forezp.tcp;
 
 import com.forezp.service.RabbitMQService;
 import com.forezp.utils.EncodeUtil;
+import com.forezp.utils.HttpUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
@@ -33,12 +34,22 @@ public class TcpNetty{
 	}
 
 	public static void main(String[] args) {
-		TcpNetty tcpNetty = new TcpNetty();
-		tcpNetty.run();
 		try {
-			Thread.sleep(2000);
-			tcpNetty.sendCmd("16214442340031303031005332302C3131313632322C312C3000E6B2B9E794B5E6938DE4BD9C1826");
-		} catch (InterruptedException e) {
+			//System.out.println(HttpUtil.Get("http://localhost:8201/device/sendCommonCmd?deviceId=127958&cmd=S17,20200601,10,1&cmdName=ABC"));
+
+			for(int t = 0;t < 20;t ++){
+				final int t1 = t;
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						System.out.println(""+t1);
+						System.out.println(HttpUtil.Get("http://localhost:8201/device/sendCommonCmd?deviceId=127958&cmd=S17,20200601,10,1&cmdName=ABC"));
+					}
+				}).start();
+
+			}
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -55,8 +66,11 @@ public class TcpNetty{
 	public synchronized int sendCmd(String cmd){
 		try {
 			logger.info("发送数据：" + cmd);
+			Thread.sleep(100);
 			if(channel == null || !channel.isOpen() || !channel.isActive()){
-				return -2;
+				logger.info("通道异常,重连："+channel.isOpen()+","+channel.isActive());
+				run();
+				//return -2;
 			}
 			byte[] cmdBytes = EncodeUtil.HexString2Bytes(cmd,cmd.length()/2);
 			ChannelFuture future = null;
